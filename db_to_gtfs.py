@@ -21,12 +21,12 @@ Options:
   --api-key=<key>               DB-API-Key
 """
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
 import string
 import time
 import unicodecsv as csv
-import HTMLParser
+import html.parser
 import os
 from dateutil.parser import parse as dateparse
 from datetime import timedelta
@@ -54,7 +54,7 @@ class DBApiToGTFS(object):
         self.start_date = options['start_date']
         self.end_date = options['end_date']
         self.out_dir = options['output_dir']
-        self.htmlparser = HTMLParser.HTMLParser()
+        self.htmlparser = html.parser.HTMLParser()
         self.unproced_counter = 0
         self.api_key = options['api_key']
 
@@ -141,9 +141,9 @@ class DBApiToGTFS(object):
         while True:
             try:
                 logging.debug('Opening %s.', url)
-                response = urllib2.urlopen(url)
+                response = urllib.request.urlopen(url)
                 break
-            except urllib2.HTTPError as err:
+            except urllib.error.HTTPError as err:
                 if timeout <= MAX_TIMEOUT:
                     logging.warn('Error opening %s, error code %d, reason is %s.', url, err.code, err.reason)
                     logging.warn('Waiting for %ds before retrying.', timeout)
@@ -376,7 +376,7 @@ class DBApiToGTFS(object):
                                           quotechar='"', fieldnames=route_fieldnames)
             route_writer.writeheader()
 
-            for stop in self.stops.itervalues():
+            for stop in self.stops.values():
                 if not stop['has_trip']:
                     continue
 
@@ -451,7 +451,7 @@ class DBApiToGTFS(object):
                 stations = stationfile.read().replace('\n', '').split(',')
                 return stations
         except IOError:
-            print('Could not read station feed file %s' % path)
+            print(('Could not read station feed file %s' % path))
         return []
 
 def main(options=None):
@@ -482,7 +482,7 @@ def main(options=None):
 
     for idx, seed in enumerate(station_seed): 
         if len(station_seed) > 10:
-            print 'Fetching details for station "%s" (%i / %i)' % (seed, idx, len(station_seed))       
+            print('Fetching details for station "%s" (%i / %i)' % (seed, idx, len(station_seed)))       
         converter.process_station_by_id(int(seed))
 
     sid = converter.get_unfetched_station_id()
@@ -511,3 +511,4 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         logging.error("Cancelled by user.")
     exit(0)
+
