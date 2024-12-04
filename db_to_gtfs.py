@@ -30,7 +30,6 @@ import html.parser
 import os
 from dateutil.parser import parse as dateparse
 from datetime import timedelta
-from sets import Set
 import logging
 FORMAT = "%(message)s"
 #FORMAT = "%(asctime)-15s %(message)s"
